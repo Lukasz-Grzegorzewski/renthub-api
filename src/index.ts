@@ -30,6 +30,8 @@ import cors from 'cors'
 import path from 'path'
 
 import { initializeRoute } from './routes'
+import { KeyvAdapter } from '@apollo/utils.keyvadapter'
+import { keyV } from './KeyVConfig'
 
 //-----------------------------------------
 //-----------------APOLLO SERVER-----------
@@ -55,6 +57,7 @@ async function start() {
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     introspection: true,
+    cache: new KeyvAdapter(keyV),
   })
 
   await dataSource.initialize()

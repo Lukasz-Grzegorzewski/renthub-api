@@ -17,6 +17,7 @@ import { Category } from '../entities/Category.entity'
 import { formatValidationErrors } from '../utils/utils'
 import { MyContext } from '../types/Context.type'
 import { Picture } from '../entities/Picture.entity'
+import { keyV } from '../KeyVConfig'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -74,6 +75,36 @@ export class ProductReferenceResolver {
       return productReferences
     } catch (error: any) {
       throw new Error(error.message)
+    }
+  }
+
+  @Query(() => [ProductReference], { nullable: true })
+  async cachedProductReferences(): Promise<ProductReference[] | null> {
+    try {
+      const cacheKey = 'productReferences'
+      const cachedData = await keyV.get(cacheKey)
+
+      if (cachedData) {
+        return cachedData
+      }
+
+      const productReferences = await ProductReference.find({
+        relations: {
+          category: true,
+          createdBy: true,
+          updatedBy: true,
+          stock: true,
+          pictures: true,
+        },
+      })
+
+      if (productReferences.length > 0) {
+        await keyV.set(cacheKey, productReferences, 3600)
+      }
+
+      return productReferences.length > 0 ? productReferences : null
+    } catch (error) {
+      throw new Error('Impossible de récupérer les données.')
     }
   }
 
