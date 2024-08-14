@@ -1,12 +1,9 @@
-name: Backend
+name: renthub-api-CI
 
 on:
-  pull_request:
-    types: [opened, reopened]
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    tags:
+      - "v*"
 
 jobs:
   test:
@@ -29,27 +26,42 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Goto backend and run tests
+      - name: Run tests
         run: npm i && npm run test
-  docker:
+
+  dockerProd:
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./.
+          context: .
+          target: prod
+          platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest, ${{ secrets.DOCKERHUB_USERNAME }}/backend:${{ github.sha }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
+            ${{ steps.meta.outputs.tags }}

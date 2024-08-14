@@ -54,9 +54,9 @@ beforeAll(async () => {
 
   // Change OPTIONS in dataSource
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(dataSource.options as any).host = process.env.DB_HOST_LOCAL
+  ;(dataSource.options as any).host = process.env.DB_HOST_LOCAL || '127.0.0.1'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
+  ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL || 5432
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(dataSource.options as any).dropSchema = true
 
