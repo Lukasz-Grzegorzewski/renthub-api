@@ -17,6 +17,7 @@ import { Category } from '../entities/Category.entity'
 import { formatValidationErrors } from '../utils/utils'
 import { MyContext } from '../types/Context.type'
 import { Picture } from '../entities/Picture.entity'
+import { redis } from '../services/cache.service'
 
 @Resolver(() => ProductReference)
 export class ProductReferenceResolver {
@@ -61,16 +62,28 @@ export class ProductReferenceResolver {
   @Query(() => [ProductReference])
   async getProductsReferences(): Promise<ProductReference[]> {
     try {
-      const productReferences = await ProductReference.find({
-        relations: {
-          category: true,
-          createdBy: true,
-          updatedBy: true,
-          stock: true,
-          pictures: true,
-        },
-      })
-
+      await redis.doConnect()
+      const redisproductReferences: string = await redis.get('productReferences')
+      let productReferences: ProductReference[] = redisproductReferences ? JSON.parse(redisproductReferences) : null
+      
+      if (!productReferences) {
+        productReferences = await ProductReference.find({
+          relations: {
+            category: true,
+            createdBy: true,
+            updatedBy: true,
+            stock: true,
+            pictures: true,
+            productCarts: { cartReference: { owner: true } },
+          },
+        })        
+        await redis.set(
+          'productReferences',
+          JSON.stringify(productReferences),
+          30
+        )
+        redis.doDisconnect()
+      }
       return productReferences
     } catch (error: any) {
       throw new Error(error.message)
