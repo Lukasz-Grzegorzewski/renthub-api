@@ -59,7 +59,8 @@ beforeAll(async () => {
   ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(dataSource.options as any).dropSchema = true
-
+  console.log('dataSource.options', dataSource.options);
+  
   await dataSource.initialize()
 })
 
