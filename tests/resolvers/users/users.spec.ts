@@ -52,15 +52,22 @@ const nickName = 'testNickName'
 beforeAll(async () => {
   schema = await getSchema()
 
+  const host = '127.0.0.1';
+  const port = Number(process.env.DB_PORT_LOCAL) || 5432;
+
   // Change OPTIONS in dataSource
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(dataSource.options as any).host = process.env.DB_HOST_LOCAL || '127.0.0.1'
+  (dataSource.options as any).host = host
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(dataSource.options as any).port = process.env.DB_PORT_LOCAL || 5432
+  ;(dataSource.options as any).port = port
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(dataSource.options as any).dropSchema = true
 
-  await dataSource.initialize()
+  try {
+    await dataSource.initialize()
+  } catch (error) {
+    console.error('PostgreSQL connection failed: ', error);
+  }
 })
 
 describe('TEST => users resolvers', () => {
