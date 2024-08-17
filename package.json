@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --verbose",
+    "test": "DB_HOST=postgres_db DB_PORT=5432 jest --detectOpenHandles --verbose",
     "test:local": "docker stop pgtesting || true && docker run --rm --name pgtesting --env-file .env -p 5436:5432 -d postgres && DB_PORT_LOCAL=5436 jest --detectOpenHandles --verbose; docker stop pgtesting",
     "echo": "grep -v '^#' .env | xargs -I {} echo export {}",
 
