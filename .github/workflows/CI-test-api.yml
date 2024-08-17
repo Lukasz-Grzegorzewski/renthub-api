@@ -61,7 +61,7 @@ jobs:
       - name: Check PostgreSQL logs
         run: docker logs $(docker ps -q --filter "ancestor=postgres")
 
-      - name: Log Application Database Connection Settings
+      - name: Verify PostgreSQL Configuration Inside Container
         run: |
           docker exec $(docker ps -q --filter "ancestor=postgres") bash -c "
           echo 'PostgreSQL Environment Variables:';
