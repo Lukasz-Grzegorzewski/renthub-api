@@ -54,6 +54,20 @@ jobs:
           docker exec $(docker ps -q --filter "ancestor=postgres") sh -c '
           echo "PostgreSQL Environment Variables:";
           printenv | grep POSTGRES;
+          
+          echo "Network Configuration:";
+          ip addr show;
+          
+          echo "PostgreSQL Listening Ports:";
+          netstat -tuln | grep 5432;
+          
+          echo "Host Information:";
+          echo "Hostname: $(hostname)";
+          echo "Host IP Address: $(hostname -I)";
+      
+          echo "Resolving Hostname postgres:";
+          ping -c 4 postgres || echo "Failed to resolve postgres";
+      
           echo "Connecting to PostgreSQL...";
           PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -c "\l";
           '
