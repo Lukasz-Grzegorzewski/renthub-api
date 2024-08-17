@@ -51,12 +51,12 @@ jobs:
 
       - name: Verify PostgreSQL Configuration Inside Container
         run: |
-          docker exec $(docker ps -q --filter "ancestor=postgres") bash -c "
-          echo 'PostgreSQL Environment Variables:';
+          docker exec $(docker ps -q --filter "ancestor=postgres") sh -c '
+          echo "PostgreSQL Environment Variables:";
           printenv | grep POSTGRES;
-          echo 'Connecting to PostgreSQL...';
-          PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -c '\l';
-          "
+          echo "Connecting to PostgreSQL...";
+          PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -c "\l";
+          '
 
       - name: Check PostgreSQL logs
         run: docker logs $(docker ps -q --filter "ancestor=postgres")
