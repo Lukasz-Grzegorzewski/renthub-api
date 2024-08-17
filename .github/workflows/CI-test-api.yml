@@ -48,19 +48,24 @@ jobs:
               sleep 5;
             fi;
           done
-
+      - name: Install Utilities in PostgreSQL Container
+        run: |
+          docker exec $(docker ps -q --filter "ancestor=postgres") sh -c '
+          apt-get update && apt-get install -y iproute2 net-tools iputils-ping;
+          '
+        
       - name: Verify PostgreSQL Configuration Inside Container
         run: |
           docker exec $(docker ps -q --filter "ancestor=postgres") sh -c '
           echo "PostgreSQL Environment Variables:";
           printenv | grep POSTGRES;
-          
+      
           echo "Network Configuration:";
           ip addr show;
-          
+      
           echo "PostgreSQL Listening Ports:";
           netstat -tuln | grep 5432;
-          
+      
           echo "Host Information:";
           echo "Hostname: $(hostname)";
           echo "Host IP Address: $(hostname -I)";
