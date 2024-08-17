@@ -18,7 +18,7 @@ jobs:
       POSTGRES_PASSWORD: 'pgpassword'
       POSTGRES_DB: 'renthub'
     services:
-      postgres:
+      postgres_db:
         image: postgres:latest
         ports:
           - 5432:5432
