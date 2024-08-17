@@ -36,21 +36,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
+      
       - name: Wait for PostgreSQL to be up
-        run: sleep 15s
+        run: sleep 30s
 
-      - name: Ensure PostgreSQL is Healthy
-        run: |
-          for i in {1..10}; do
-            if [ "$(docker inspect --format='{{json .State.Health.Status}}' $(docker ps -q --filter "ancestor=postgres"))" == "\"healthy\"" ]; then
-              echo "PostgreSQL is healthy!";
-              break;
-            else
-              echo "Waiting for PostgreSQL to be healthy...";
-              sleep 5;
-            fi;
-          done
+      - name: Check PostgreSQL logs
+        run: docker logs $(docker ps -q --filter "ancestor=postgres")
 
       - name: Run tests
         run: npm i && npm run test
