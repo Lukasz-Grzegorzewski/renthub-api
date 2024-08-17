@@ -54,11 +54,11 @@ beforeAll(async () => {
 
   const host = process.env.CI ? process.env.DB_HOST : process.env.DB_HOST_LOCAL || '127.0.0.1'
   const port = process.env.CI ? process.env.DB_PORT : process.env.DB_PORT_LOCAL || 5432
-  console.log("process.env.CI", process.env.CI);
-  console.log("process.env.DB_HOST", process.env.DB_HOST);
-  console.log("process.env.DB_HOST", process.env.DB_PORT);
-  console.log("host", host);
-  console.log("port", port);
+  // console.log("process.env.CI", process.env.CI);
+  // console.log("process.env.DB_HOST", process.env.DB_HOST);
+  // console.log("process.env.DB_HOST", process.env.DB_PORT);
+  // console.log("host", host);
+  // console.log("port", port);
 
   // Change OPTIONS in dataSource
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,6 +69,7 @@ beforeAll(async () => {
   ;(dataSource.options as any).dropSchema = true
 
   try {
+    console.log("PSQL options during initialization", dataSource.options);
     await dataSource.initialize()
     console.log('PostgreSQL connected successfully.');
   } catch (error) {

@@ -36,12 +36,40 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      
+
       - name: Wait for PostgreSQL to be up
-        run: sleep 30s
+        run: |
+          for i in {1..10}; do
+            if docker inspect --format='{{json .State.Health.Status}}' $(docker ps -q --filter "ancestor=postgres") | grep -q '"healthy"'; then
+              echo "PostgreSQL is healthy!";
+              break;
+            else
+              echo "Waiting for PostgreSQL to be healthy...";
+              sleep 5;
+            fi;
+          done
+
+      - name: Verify PostgreSQL Configuration Inside Container
+        run: |
+          docker exec -it $(docker ps -q --filter "ancestor=postgres") bash -c "
+          echo 'PostgreSQL Environment Variables:';
+          printenv | grep POSTGRES;
+          echo 'Connecting to PostgreSQL...';
+          PGPASSWORD=$POSTGRES_PASSWORD psql -U $POSTGRES_USER -d $POSTGRES_DB -c '\l';
+          "
 
       - name: Check PostgreSQL logs
         run: docker logs $(docker ps -q --filter "ancestor=postgres")
+
+      - name: Log Application Database Connection Settings
+        run: |
+          node -e "
+          console.log('Connecting to PostgreSQL with the following settings:');
+          console.log('Host:', process.env.DB_HOST);
+          console.log('Port:', process.env.DB_PORT);
+          console.log('User:', process.env.DB_USER);
+          console.log('Database:', process.env.DB_NAME);
+          "
 
       - name: Run tests
         run: npm i && npm run test
