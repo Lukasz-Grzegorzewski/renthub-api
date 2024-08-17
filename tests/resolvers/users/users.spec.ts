@@ -49,16 +49,38 @@ const email = 'example@gmail.com'
 const password = 'Azerty@123'
 const nickName = 'testNickName'
 
+const waitForPostgres = async () => {
+  let retries = 5
+  while (retries) {
+    try {
+      await dataSource.initialize()
+      console.log('Connected to PostgreSQL')
+      break
+    } catch (err) {
+      console.log(
+        `PostgreSQL connection failed. Retrying in 5 seconds... (${retries} retries left)`
+      )
+      retries -= 1
+      await new Promise((res) => setTimeout(res, 5000))
+    }
+  }
+  if (!retries) throw new Error('Unable to connect to PostgreSQL')
+}
+
 beforeAll(async () => {
   schema = await getSchema()
 
-  const host = process.env.CI ? process.env.DB_HOST : process.env.DB_HOST_LOCAL || '127.0.0.1'
-  const port = process.env.CI ? process.env.DB_PORT : process.env.DB_PORT_LOCAL || 5432
-  console.log("process.env.CI", process.env.CI);
-  console.log("process.env.DB_HOST", process.env.DB_HOST);
-  console.log("process.env.DB_HOST", process.env.DB_PORT);
-  console.log("host", host);
-  console.log("port", port);
+  const host = process.env.CI
+    ? process.env.DB_HOST
+    : process.env.DB_HOST_LOCAL || '127.0.0.1'
+  const port = process.env.CI
+    ? process.env.DB_PORT
+    : process.env.DB_PORT_LOCAL || 5432
+  console.log('process.env.CI', process.env.CI)
+  console.log('process.env.DB_HOST', process.env.DB_HOST)
+  console.log('process.env.DB_HOST', process.env.DB_PORT)
+  console.log('host', host)
+  console.log('port', port)
 
   // Change OPTIONS in dataSource
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,7 +90,7 @@ beforeAll(async () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(dataSource.options as any).dropSchema = true
 
-  await dataSource.initialize()
+  await waitForPostgres()
 })
 
 describe('TEST => users resolvers', () => {
