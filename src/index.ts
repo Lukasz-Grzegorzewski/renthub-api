@@ -40,6 +40,7 @@ const corsOptions = {
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
   optionsSuccessStatus: 200,
+  allowedHeaders: ['Content-Type', 'apollo-require-preflight'],
 }
 app.use(cors(corsOptions))
 app.use(express.json({ limit: '50mb' }))
@@ -61,18 +62,18 @@ async function start() {
   await server.start()
 
   app.use('/', (req: Request, res: Response, next) => {
-    if (req.path === '/api/images') {
+    if (req.path === '/api/images' && req.method === 'POST') {
       return next()
     }
-    express.json({ limit: '50mb' }),
-      expressMiddleware(server, {
-        context: async (args) => {
-          return {
-            req: args.req,
-            res: args.res,
-          }
-        },
-      })(req, res, next)
+    // express.json({ limit: '50mb' }),
+    expressMiddleware(server, {
+      context: async (args) => {
+        return {
+          req: args.req,
+          res: args.res,
+        }
+      },
+    })(req, res, next)
   })
 
   initializeRoute(app)

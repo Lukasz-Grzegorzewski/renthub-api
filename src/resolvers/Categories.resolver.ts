@@ -58,8 +58,12 @@ export class CategoriesResolver {
 
   @Authorized('ADMIN')
   @Mutation(() => Category, { nullable: true })
-  async updateCategory(@Arg('data') data: CategoryUpdateInput) {
-    const category = await new CategoryService().update(data)
+  async updateCategory(
+    @Ctx() context: MyContext,
+    @Arg('data') data: CategoryUpdateInput
+  ) {
+    if (!context.user) throw new Error('User updating not found')
+    const category = await new CategoryService().update(data, context.user)
 
     return category
   }

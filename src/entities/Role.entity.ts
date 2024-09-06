@@ -1,21 +1,17 @@
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, ObjectType } from 'type-graphql'
 import { Length, Matches } from 'class-validator'
 import { User } from './User.entity'
+import { EntityWithDefault } from './EntityWithDefault'
 
 @Entity()
 @ObjectType()
-export class Role extends BaseEntity {
+export class Role extends EntityWithDefault {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id!: number
@@ -37,27 +33,9 @@ export class Role extends BaseEntity {
   @Field()
   right!: string
 
-  @CreateDateColumn()
-  @Field()
-  createdAt!: Date
-
   @OneToMany(() => User, (user) => user.role)
   @Field(() => [User])
   user!: User
-
-  @UpdateDateColumn()
-  @Field(() => Date)
-  updatedAt!: Date
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'createdBy' })
-  @Field(() => User, { nullable: true })
-  createdBy!: User
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'updatedBy' })
-  @Field(() => User, { nullable: true })
-  updatedBy!: User
 }
 
 @InputType()

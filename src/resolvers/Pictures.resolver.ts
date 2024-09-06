@@ -36,7 +36,7 @@ export class PictureResolver {
     const newPicture = await new PictureService().createOnCategory(
       data,
       idCategory,
-      context.user.id
+      context.user
     )
 
     return newPicture
@@ -56,7 +56,7 @@ export class PictureResolver {
     return await new PictureService().updateOnCategory(
       idPicture,
       data,
-      context.user.id
+      context.user
     )
   }
   // @TODO: suppression du code sur la featured multer ( accessible dans le commit )

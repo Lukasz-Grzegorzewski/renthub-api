@@ -35,16 +35,13 @@ export class ProductReferenceResolver {
       const category = await Category.findOne({
         where: { id: data.category.id },
       })
-      if (!category) {
-        throw new Error('Aucune catégorie trouvé')
-      }
+      if (!category) throw new Error('Aucune catégorie trouvé')
+
       const newPicture = await Picture.findOne({
         where: { id: data.pictures[0].id },
       })
+      if (!newPicture) throw new Error('Aucune image trouvé')
 
-      if (!newPicture) {
-        throw new Error('Aucune image trouvé')
-      }
       Object.assign(newProductReference, data)
       newProductReference.createdBy = context.user
       const errors = await validate(newProductReference)
@@ -63,9 +60,12 @@ export class ProductReferenceResolver {
   async getProductsReferences(): Promise<ProductReference[]> {
     try {
       await redis.doConnect()
-      const redisproductReferences: string = await redis.get('productReferences')
-      let productReferences: ProductReference[] = redisproductReferences ? JSON.parse(redisproductReferences) : null
-      
+      const redisproductReferences: string =
+        await redis.get('productReferences')
+      let productReferences: ProductReference[] = redisproductReferences
+        ? JSON.parse(redisproductReferences)
+        : null
+
       if (!productReferences) {
         productReferences = await ProductReference.find({
           relations: {
@@ -76,7 +76,7 @@ export class ProductReferenceResolver {
             pictures: true,
             productCarts: { cartReference: { owner: true } },
           },
-        })        
+        })
         await redis.set(
           'productReferences',
           JSON.stringify(productReferences),

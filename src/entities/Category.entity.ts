@@ -1,23 +1,21 @@
 import 'reflect-metadata'
 import {
-  BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm'
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { Picture } from './Picture.entity'
 import { ProductReference } from './ProductReference.entity'
+import { EntityWithDefault } from './EntityWithDefault'
 
 @Entity()
 @ObjectType()
-export class Category extends BaseEntity {
+export class Category extends EntityWithDefault {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id: number
@@ -34,22 +32,6 @@ export class Category extends BaseEntity {
   @Column({ default: true })
   @Field(() => Boolean, { nullable: true })
   display: boolean
-
-  @Column({ nullable: true })
-  @Field(() => ID, { nullable: true })
-  createdBy: number
-
-  @Column({ nullable: true })
-  @Field(() => ID, { nullable: true })
-  updatedBy: number
-
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  @Field()
-  createdAt: Date
-
-  @UpdateDateColumn({ type: 'timestamp with time zone', nullable: true })
-  @Field({ nullable: true })
-  updatedAt!: Date
 
   @ManyToOne(() => Category, (category) => category.childCategories, {
     nullable: true,
@@ -105,9 +87,6 @@ export class CategoryUpdateInput {
 
   @Field(() => Boolean, { nullable: true })
   display?: boolean
-
-  @Field(() => ID)
-  updatedBy: number
 
   @Field(() => ID, { nullable: true })
   parentCategoryId: number

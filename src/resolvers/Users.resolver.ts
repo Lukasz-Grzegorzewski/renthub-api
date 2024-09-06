@@ -306,9 +306,10 @@ export class UsersResolver {
   @Mutation(() => User, { nullable: true })
   async userUpdate(
     @Ctx() context: MyContext,
-    @Arg('data') data: UserUpdateInput
+    @Arg('data') data: UserUpdateInput,
+    @Arg('userId', () => ID) userId?: number
   ): Promise<User | null> {
-    const id = context.user?.id
+    const id = userId || context.user?.id
     if (!id) throw new Error('User not found in Context')
 
     const isUserAuthorised = isRightUser(id, context)
@@ -330,7 +331,7 @@ export class UsersResolver {
     if (!isUserAuthorised)
       throw new Error('User not authorized for this delete')
 
-    const user = await new UserService().find(id)
+    const user = await new UserService().delete(id)
     return user
   }
 }

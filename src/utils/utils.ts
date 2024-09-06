@@ -92,3 +92,7 @@ export function calculateDaysBetweenDates(
   const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
   return dayDifference
 }
+
+export function replaceSpacesWith_(str: string): string {
+  return str.replace(/\s/g, '_')
+}
