@@ -11,7 +11,7 @@ import { replaceSpacesWith_ } from '../utils'
 
 const tempStoragePath = '/app/public/temp'
 const storagePath = '/app/public'
-fs.mkdirSync(tempStoragePath, { recursive: true })
+
 
 // Temp storage for uploaded files
 const tempStorage = multer.diskStorage({
@@ -20,6 +20,7 @@ const tempStorage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
+    fs.mkdirSync(tempStoragePath, { recursive: true })
     cb(null, tempStoragePath)
   },
   filename: (
