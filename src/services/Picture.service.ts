@@ -1,8 +1,16 @@
 import { Category } from '../entities/Category.entity'
-import { Picture, PictureCreateInput, PictureUpdate } from '../entities/Picture.entity'
+import {
+  Picture,
+  PictureCreateInput,
+  PictureUpdate,
+} from '../entities/Picture.entity'
 import { Repository } from 'typeorm'
 import { validate } from 'class-validator'
 import { dataSource } from '../datasource'
+import { User } from '../entities/User.entity'
+import Cookies from 'cookies'
+import { Request, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
 export class PictureService {
   db: Repository<Picture>
@@ -16,16 +24,10 @@ export class PictureService {
     return listPicture
   }
 
-  async find(id: number, includeCategory: boolean = true) {
-    const relations: string[] = []
-
-    if (includeCategory) {
-      relations.push('category')
-    }
-
+  async find(id: number) {
     const picture = await this.db.findOne({
       where: { id },
-      relations,
+      relations: { category: true, updatedBy: true, createdBy: true },
     })
 
     if (!picture) {
@@ -34,21 +36,62 @@ export class PictureService {
     return picture
   }
 
-  async createImage(
-    domain: string,
-    filename: string,
-    name: string,
-    mimetype: string,
-    path: string
-  ) {
+  async createImage({
+    name,
+    mimetype,
+    path,
+    urlHD,
+    urlMiniature,
+    // type,
+    // referenceId,
+    context,
+  }: PictureCreateInput & {
+    context: { req: Request; res: Response }
+  }) {
+    const cookies = new Cookies(context.req, context.res)
+    const renthub_token = cookies.get('renthub_token')
+
+    if (!renthub_token) throw new Error('Not authenticated')
+    let createdBy: User | null = null
+
     try {
+      // Verify token
+      const payload = jwt.verify(
+        renthub_token,
+        process.env.JWT_SECRET_KEY || ''
+      )
+      // Get user from payload
+      if (typeof payload === 'object' && 'userId' in payload) {
+        const user = await User.findOne({
+          where: { id: payload.userId },
+          relations: {
+            role: true,
+          },
+        })
+        createdBy = user
+        if (createdBy?.role?.right !== 'ADMIN')
+          throw new Error('User not found or is not authorised')
+      }
+    } catch (err) {
+      console.error('Error verifying token:', err)
+    }
+
+    if (!createdBy) throw new Error('User not found')
+    try {
+      // relation for picture
+      const relation = {}
+      // if (referenceId) {
+      //   Object.assign(relation, { [type]: { id: referenceId } })
+      // }
+
       const picture = this.db.create({
         name,
         mimetype,
         path,
-        urlHD: ` http://${domain}/uploads/${filename}`,
-        urlMiniature: ` http://${domain}/uploads/${filename}`,
-        createdBy: 1,
+        urlHD,
+        urlMiniature,
+        createdBy,
+        ...relation,
       })
 
       const pictureSave = await picture.save()
@@ -61,7 +104,7 @@ export class PictureService {
   async createOnCategory(
     pictureInput: PictureCreateInput,
     idCategory: number,
-    userId: number
+    user: User
   ) {
     const errors = await validate(pictureInput)
 
@@ -78,7 +121,7 @@ export class PictureService {
 
     const newPicture = this.db.create({
       ...pictureInput,
-      createdBy: userId,
+      createdBy: user,
       category: CategoryExist,
     })
     await this.db.save(newPicture)
@@ -88,7 +131,7 @@ export class PictureService {
   async updateOnCategory(
     idPicture: number,
     pictureInput: PictureUpdate,
-    userId: number
+    user: User
   ) {
     const errors = await validate(pictureInput)
 
@@ -105,7 +148,7 @@ export class PictureService {
     }
     const pictureToSave = this.db.merge(pictureUpdate, {
       ...pictureInput,
-      updatedBy: userId,
+      updatedBy: user,
     })
     return await this.db.save(pictureToSave)
   }

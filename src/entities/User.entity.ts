@@ -1,13 +1,10 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
   ManyToOne,
-  UpdateDateColumn,
-  CreateDateColumn,
   OneToMany,
 } from 'typeorm'
 import {
@@ -25,10 +22,11 @@ import { ObjectId } from './ObjectId'
 import { VerificationCode } from './VerificationCode.entity'
 import { Cart } from './Cart.entity'
 import { Order } from './Order.entity'
+import { EntityWithDefault } from './EntityWithDefault'
 
 @Entity()
 @ObjectType()
-export class User extends BaseEntity {
+export class User extends EntityWithDefault {
   @PrimaryGeneratedColumn()
   @Field(() => ID)
   id!: number
@@ -91,27 +89,11 @@ export class User extends BaseEntity {
   @Field(() => Date, { nullable: true })
   lastConnectionDate!: Date
 
-  @CreateDateColumn({ type: 'timestamp' })
-  @Field(() => Date)
-  createdAt!: Date
-
-  @ManyToOne(() => User, (user) => user.createdBy)
-  @Field(() => User, { nullable: true })
-  createdBy!: User
-
-  @UpdateDateColumn()
-  @Field(() => Date)
-  updatedAt!: Date
-
-  @ManyToOne(() => User, (user) => user.updatedBy, { nullable: true })
-  @Field(() => User, { nullable: true })
-  updatedBy!: User
-
   @OneToOne(() => Picture, { nullable: true, onDelete: 'CASCADE' })
   @IsOptional()
   @JoinColumn()
   @Field(() => Picture, { nullable: true })
-  picture?: Picture
+  avatar?: Picture
 
   @OneToMany(
     () => VerificationCode,
@@ -120,7 +102,7 @@ export class User extends BaseEntity {
   )
   verificationCodes!: VerificationCode[]
 
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany(() => Order, (order) => order.user, { cascade: true, onDelete: 'CASCADE' })
   @Field(() => [Order], { nullable: true })
   orders!: Order[]
 
@@ -191,16 +173,13 @@ export class UserUpdateInput {
     message:
       'Password is not valid. At least 8 characters, 1 uppercase, 1 lowercase, 1 special characters and 1 number required!',
   })
-  password!: string
+  password?: string
 
   @Field({ nullable: true })
   phoneNumber!: string
 
   @Field({ nullable: true })
   isVerified!: boolean
-
-  @Field(() => ID, { nullable: true })
-  updatedBy?: number
 
   @Field(() => Int, { nullable: true })
   pictureId?: number

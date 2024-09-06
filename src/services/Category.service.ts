@@ -22,6 +22,7 @@ export class CategoryService {
         parentCategory: true,
         picture: true,
         productReferences: true,
+        createdBy: true,
       },
     })
 
@@ -36,6 +37,7 @@ export class CategoryService {
         parentCategory: true,
         picture: true,
         productReferences: true,
+        createdBy: true,
       },
     })
 
@@ -63,8 +65,8 @@ export class CategoryService {
       }
       Object.assign(newCategory, { parentCategory: parentCategoryIdExist })
     }
-    newCategory.createdBy = user.id
-    newCategory.updatedBy = user.id
+    newCategory.createdBy = user
+    newCategory.updatedBy = user
     const { id } = await this.db.save(newCategory)
     if (!id) throw new Error('Category not saved')
     const newCategorySave = await this.find(id)
@@ -72,7 +74,7 @@ export class CategoryService {
     return newCategorySave
   }
 
-  async update(data: CategoryUpdateInput) {
+  async update(data: CategoryUpdateInput, user: User) {
     const errors = await validate(data)
     if (errors.length > 0) {
       throw new Error('Validation failed!')
@@ -95,7 +97,7 @@ export class CategoryService {
       if (!parentCategoryIdExist) {
         throw new Error('Parent category not found')
       }
-      Object.assign(category, { parentCategory: parentCategoryIdExist })
+      Object.assign(category, { parentCategory: parentCategoryIdExist, updatedBy: user })
     }
     this.db.merge(category, data)
     const updatedCategory = await this.db.save(category)

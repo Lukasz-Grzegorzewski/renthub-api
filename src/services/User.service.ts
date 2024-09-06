@@ -50,7 +50,7 @@ export class UserService {
           },
         },
         role: true,
-        picture: true,
+        avatar: true,
         createdBy: true,
         updatedBy: true,
         orders: { orderStocks: { stock: true } },
@@ -69,7 +69,10 @@ export class UserService {
           },
         },
         role: true,
-        picture: true,
+        avatar: true,
+        createdBy: true,
+        updatedBy: true,
+        orders: { orderStocks: { stock: { productReference: true } } },
       },
     })
     if (!user) throw new Error('User not found')
@@ -139,18 +142,27 @@ export class UserService {
   async update(id: number, data: UserUpdateInput) {
     const user = await this.db.findOne({
       where: { id },
-      relations: { picture: true, role: true, cart: true },
+      relations: { avatar: true, role: true, cart: true },
     })
     if (!user) throw new Error('User not found')
 
+    if (data.password) {
+      try {
+        user.hashedPassword = await argon2.hash(data.password)
+      } catch (error) {
+        throw new Error(`Error hashing password: ${error}`)
+      }
+      delete data.password
+    }
+
     let oldPictureId: number | null = null
-    if (data.pictureId && user.picture?.id) {
-      oldPictureId = user.picture.id
+    if (data.pictureId && user.avatar?.id) {
+      oldPictureId = user.avatar.id
       const newPicture = await Picture.findOne({
         where: { id: data.pictureId },
       })
       if (!newPicture) throw new Error('New picture not found')
-      user.picture = newPicture
+      user.avatar = newPicture
     }
 
     Object.assign(user, data)
@@ -174,19 +186,15 @@ export class UserService {
     const user = await User.findOne({
       where: { id },
       relations: {
-        picture: true,
+        avatar: true,
         role: true,
         cart: true,
       },
     })
     if (!user) throw new Error('User not found')
 
-    const pictureId = user.picture?.id
-
     await user.remove()
-    if (pictureId) {
-      await deletePicture(pictureId)
-    }
+    if (user.avatar?.id) await deletePicture(user.avatar.id)
 
     Object.assign(user, { id })
     return user

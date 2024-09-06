@@ -14,8 +14,9 @@ export const sendVerificationEmail = async (
   </div>
   <div class="content">
     <p>Votre code de vérification est : <strong>${userCode}</strong></p>
-    <p>Cliquez sur le lien ci-dessous pour valider votre inscription et rejoindre notre communauté !</p>
+    <p>Pour valider votre inscription et rejoindre notre communauté cliquez sur le lien ci-dessous</p>
     <a href="${verificationLink}" class="button">Vérifiez votre email</a>
+    <p>ou copiez le lien : <span style="color: blue">${verificationLink}</span> et collez dans le navigateur.</p>
   </div>
   <div class="footer">
     Si vous n'avez pas demandé cette inscription, veuillez ignorer cet email.

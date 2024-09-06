@@ -55,6 +55,7 @@ export const customAuthChecker: AuthChecker<MyContext> = async (
 
   return false
 }
+
 export const checkUserRights = async (
   req: Request,
   res: Response,
@@ -72,6 +73,7 @@ export const checkUserRights = async (
   const hasAccess = await customAuthChecker(resolverData, roles)
 
   if (hasAccess) {
+    req.body.user = context.user
     next()
   } else {
     res.status(403).json({ message: 'Access denied' })
