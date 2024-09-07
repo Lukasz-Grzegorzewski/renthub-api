@@ -622,6 +622,7 @@ ALTER TABLE ONLY public.verification_code ALTER COLUMN id SET DEFAULT nextval('p
 
 COPY public.cart (id, "totalPrice") FROM stdin;
 1	0
+2	0
 \.
 
 
@@ -737,6 +738,7 @@ COPY public.stock ("createdAt", "updatedAt", id, name, "isAvailable", "serialNum
 
 COPY public."user" ("createdAt", "updatedAt", id, "firstName", "lastName", "nickName", "dateOfBirth", "hashedPassword", "phoneNumber", email, "isVerified", "lastConnectionDate", "createdBy", "updatedBy", "avatarId", role, "cartId") FROM stdin;
 2024-01-01 00:00:00	\N	1	Lukasz	SuperDev	Lulu	1985-07-23 00:00:00+00	$argon2id$v=19$m=65536,t=3,p=4$jTqXIhRXrLmgpBknU6HtYA$eTwliyGdxEgF4pYEQq/r1TYE9nQEVAvSbw6OeAAMlpc	0611111111	grzegorzewski.luk@gmail.com	t	\N	1	\N	1	1	1
+2024-01-01 00:00:00	\N	2	Luk	Grz	Zed	1985-07-23 00:00:00+00	$argon2id$v=19$m=65536,t=3,p=4$c430gVPYflc+khCbj29lyg$cBcf2iZLduQdqH5BqZvYIw/vZ0dlJPL6NJV6sEf0W3o	0612345678	zed11temp@gmail.com	f	\N	2	\N	\N	2	2
 \.
 
 
@@ -753,6 +755,7 @@ COPY public.user_token (id, token, "createdAt", "userId") FROM stdin;
 --
 
 COPY public.verification_code (id, type, code, "expirationDate", "maximumTry", "userId") FROM stdin;
+1	code-verification	7660b397	2024-09-08 02:06:13.34	0	2
 \.
 
 
@@ -760,14 +763,14 @@ COPY public.verification_code (id, type, code, "expirationDate", "maximumTry", "
 -- Name: cart_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.cart_id_seq', 1, true);
+SELECT pg_catalog.setval('public.cart_id_seq', 3, true);
 
 
 --
 -- Name: category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.category_id_seq', 11, true);
+SELECT pg_catalog.setval('public.category_id_seq', 1, false);
 
 
 --
@@ -788,7 +791,7 @@ SELECT pg_catalog.setval('public.order_stock_id_seq', 1, false);
 -- Name: picture_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.picture_id_seq', 16, true);
+SELECT pg_catalog.setval('public.picture_id_seq', 3, true);
 
 
 --
@@ -802,7 +805,7 @@ SELECT pg_catalog.setval('public.product_cart_id_seq', 1, false);
 -- Name: product_reference_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.product_reference_id_seq', 12, true);
+SELECT pg_catalog.setval('public.product_reference_id_seq', 1, false);
 
 
 --
@@ -816,14 +819,14 @@ SELECT pg_catalog.setval('public.role_id_seq', 2, true);
 -- Name: stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.stock_id_seq', 5, true);
+SELECT pg_catalog.setval('public.stock_id_seq', 1, false);
 
 
 --
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.user_id_seq', 1, true);
+SELECT pg_catalog.setval('public.user_id_seq', 2, true);
 
 
 --
@@ -837,7 +840,7 @@ SELECT pg_catalog.setval('public.user_token_id_seq', 1, false);
 -- Name: verification_code_id_seq; Type: SEQUENCE SET; Schema: public; Owner: lukasz
 --
 
-SELECT pg_catalog.setval('public.verification_code_id_seq', 1, false);
+SELECT pg_catalog.setval('public.verification_code_id_seq', 1, true);
 
 
 --
@@ -945,11 +948,11 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- Name: user REL_7478a15985dbfa32ed5fc77a7a; Type: CONSTRAINT; Schema: public; Owner: lukasz
+-- Name: user REL_58f5c71eaab331645112cf8cfa; Type: CONSTRAINT; Schema: public; Owner: lukasz
 --
 
 ALTER TABLE ONLY public."user"
-    ADD CONSTRAINT "REL_7478a15985dbfa32ed5fc77a7a" UNIQUE ("avatarId");
+    ADD CONSTRAINT "REL_58f5c71eaab331645112cf8cfa" UNIQUE ("avatarId");
 
 
 --
@@ -989,7 +992,7 @@ ALTER TABLE ONLY public."user"
 --
 
 ALTER TABLE ONLY public.category
-    ADD CONSTRAINT "FK_00bcc17ae1cb987a45edc616240" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_00bcc17ae1cb987a45edc616240" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -997,7 +1000,7 @@ ALTER TABLE ONLY public.category
 --
 
 ALTER TABLE ONLY public.product_reference
-    ADD CONSTRAINT "FK_1136b88e3ec241a26259cce916b" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_1136b88e3ec241a26259cce916b" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1005,7 +1008,7 @@ ALTER TABLE ONLY public.product_reference
 --
 
 ALTER TABLE ONLY public.role
-    ADD CONSTRAINT "FK_17be5172ac2f4c67687a2e7c67d" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_17be5172ac2f4c67687a2e7c67d" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1013,7 +1016,7 @@ ALTER TABLE ONLY public.role
 --
 
 ALTER TABLE ONLY public."order"
-    ADD CONSTRAINT "FK_2a142cd65f2cffe2d70de14ff36" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_2a142cd65f2cffe2d70de14ff36" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1029,7 +1032,7 @@ ALTER TABLE ONLY public.order_stock
 --
 
 ALTER TABLE ONLY public.order_stock
-    ADD CONSTRAINT "FK_2df465dc91bef55a2dd199317f5" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_2df465dc91bef55a2dd199317f5" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1045,7 +1048,7 @@ ALTER TABLE ONLY public."user"
 --
 
 ALTER TABLE ONLY public.product_reference
-    ADD CONSTRAINT "FK_3db94b86d8a4ef9e9728bf7c156" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_3db94b86d8a4ef9e9728bf7c156" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1053,7 +1056,7 @@ ALTER TABLE ONLY public.product_reference
 --
 
 ALTER TABLE ONLY public.picture
-    ADD CONSTRAINT "FK_4ca8f2e62a6ca87e53cadb58cf9" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_4ca8f2e62a6ca87e53cadb58cf9" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1061,7 +1064,7 @@ ALTER TABLE ONLY public.picture
 --
 
 ALTER TABLE ONLY public.stock
-    ADD CONSTRAINT "FK_504fa71ab2541f76b3710fcea88" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_504fa71ab2541f76b3710fcea88" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1077,7 +1080,7 @@ ALTER TABLE ONLY public."user"
 --
 
 ALTER TABLE ONLY public.role
-    ADD CONSTRAINT "FK_64a1786ac86cd459077a53f411f" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_64a1786ac86cd459077a53f411f" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1101,7 +1104,7 @@ ALTER TABLE ONLY public."order"
 --
 
 ALTER TABLE ONLY public.stock
-    ADD CONSTRAINT "FK_6be62c1de6177b81bf70a524986" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_6be62c1de6177b81bf70a524986" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1125,7 +1128,7 @@ ALTER TABLE ONLY public.order_stock
 --
 
 ALTER TABLE ONLY public."user"
-    ADD CONSTRAINT "FK_82319f64187836b307e6d6ba08d" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_82319f64187836b307e6d6ba08d" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1141,7 +1144,7 @@ ALTER TABLE ONLY public.category
 --
 
 ALTER TABLE ONLY public.order_stock
-    ADD CONSTRAINT "FK_9af086fb9e7575cbc55fb4c904a" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_9af086fb9e7575cbc55fb4c904a" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1165,7 +1168,7 @@ ALTER TABLE ONLY public.category
 --
 
 ALTER TABLE ONLY public."user"
-    ADD CONSTRAINT "FK_a19025a009be58684a63961aaf3" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_a19025a009be58684a63961aaf3" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1197,7 +1200,7 @@ ALTER TABLE ONLY public.picture
 --
 
 ALTER TABLE ONLY public.picture
-    ADD CONSTRAINT "FK_cf8e46f10d20682d52ff4b55c30" FOREIGN KEY ("createdBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_cf8e46f10d20682d52ff4b55c30" FOREIGN KEY ("createdBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1213,7 +1216,7 @@ ALTER TABLE ONLY public.user_token
 --
 
 ALTER TABLE ONLY public.category
-    ADD CONSTRAINT "FK_dbec3186ea4b206ce9694e3bb88" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_dbec3186ea4b206ce9694e3bb88" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
@@ -1229,7 +1232,7 @@ ALTER TABLE ONLY public.product_reference
 --
 
 ALTER TABLE ONLY public."order"
-    ADD CONSTRAINT "FK_fa6a675e30b3b9e71a9388bf288" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id);
+    ADD CONSTRAINT "FK_fa6a675e30b3b9e71a9388bf288" FOREIGN KEY ("updatedBy") REFERENCES public."user"(id) ON DELETE SET NULL;
 
 
 --
