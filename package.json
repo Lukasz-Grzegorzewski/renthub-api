@@ -7,7 +7,6 @@
     "test": "jest --detectOpenHandles --verbose",
     "test:local": "docker stop pgtesting || true && docker run --rm --name pgtesting --env-file .env -p 5436:5432 -d postgres && jest --detectOpenHandles --verbose; docker stop pgtesting",
     "echo": "grep -v '^#' .env | xargs -I {} echo export {}",
-
     "start": "tsnd --poll --respawn --transpile-only ./src/index.ts",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
@@ -24,7 +23,7 @@
     "@apollo/server": "^4.9.5",
     "@faker-js/faker": "^8.4.1",
     "argon2": "^0.31.2",
-    "axios": "^1.6.2",
+    "axios": "^1.7.7",
     "class-validator": "^0.14.0",
     "cookie": "^0.6.0",
     "cookies": "^0.9.1",

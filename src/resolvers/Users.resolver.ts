@@ -6,6 +6,7 @@ import {
   Ctx,
   ID,
   Authorized,
+  Int,
 } from 'type-graphql'
 import {
   MeUser,
@@ -307,7 +308,7 @@ export class UsersResolver {
   async userUpdate(
     @Ctx() context: MyContext,
     @Arg('data') data: UserUpdateInput,
-    @Arg('userId', () => ID) userId?: number
+    @Arg('userId', () => Int) userId?: number
   ): Promise<User | null> {
     const id = userId || context.user?.id
     if (!id) throw new Error('User not found in Context')
