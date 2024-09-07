@@ -41,7 +41,7 @@ async function createMainCategory(
 ) {
   const mainCategory = await categoryFactory.make()
   mainCategory.name = mainCategoryName
-  mainCategory.createdBy = admins[Math.floor(Math.random() * admins.length)].id
+  mainCategory.createdBy = admins[Math.floor(Math.random() * admins.length)]
   const mainCategorySaved = await mainCategory.save()
   return mainCategorySaved
 }
@@ -58,7 +58,7 @@ async function createSubcategories(
 
     const subCategory = await categoryFactory.make()
     subCategory.name = subCategoryName
-    subCategory.createdBy = admins[Math.floor(Math.random() * admins.length)].id
+    subCategory.createdBy = admins[Math.floor(Math.random() * admins.length)]
     subCategory.parentCategory = mainCategory
     const subCategorySaved = await subCategory.save()
     subCategoriesSaved.push(subCategorySaved)
