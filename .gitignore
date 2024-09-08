@@ -29,4 +29,4 @@ uploads/**
 .DS_Store
 Thumbs.db
 temp
-images
+# images
