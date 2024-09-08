@@ -326,7 +326,7 @@ export class UsersResolver {
   @Mutation(() => User, { nullable: true })
   async userDelete(
     @Ctx() context: MyContext,
-    @Arg('id', () => ID) id: number
+    @Arg('id', () => Int) id: number
   ): Promise<User | null> {
     const isUserAuthorised = isRightUser(id, context)
     if (!isUserAuthorised)
