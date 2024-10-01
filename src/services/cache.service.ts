@@ -7,7 +7,7 @@ redisClient.on('error', (error) => {
 })
 
 redisClient.on('connect', () => {
-  console.warn('Redis client connected')
+  // console.warn('Redis client connected')
 })
 
 export const redis = {
